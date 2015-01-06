@@ -2,7 +2,7 @@
 # example of iterating a nonce in a hashing algorithm's input
 
 import hashlib
-
+    
 text = "I am Satoshi Nakamoto"
 
 # iterate nonce from 0 to 19

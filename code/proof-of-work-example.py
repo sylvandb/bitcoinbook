@@ -1,41 +1,46 @@
 #!/usr/bin/env python
 # example of proof-of-work algorithm
 
-from hashlib import sha256
-from time import time
-from random import randint,seed
+import hashlib
+import time
+import random
 
 max_nonce = 2 ** 32 # 4 billion
-
 
 def proof_of_work(header, difficulty_bits):
     
     # calculate the difficulty target
     target = 2 ** (256-difficulty_bits)
     
-    for nonce in xrange(max_nonce):
+    # for random nonce's, replace the "nonce = ..." line inside the loop with:
+            #nonce = random.randint(0, max_nonce)
+        # (putting a comment inside the loop slows it down)
+    for tries in xrange(max_nonce):
+        nonce = tries
         hash_result = hashlib.sha256(str(header)+str(nonce)).hexdigest()
         
         # check if this is a valid result, below the target
         if long(hash_result, 16) < target:
-            print "Success with nonce %s" % nonce
-            return (hash_result,tries)
+            print "Success with nonce %d" % nonce
+            print "Hash is %s" % hash_result
+            return (hash_result,nonce)
+            
+    print "Failed after %d (max_nonce) tries" % nonce
+    return ('',nonce)
 
-    return ('',tries)
-
-
+    
 if __name__ == '__main__':
     
     nonce = 0
     hash_result = ''
-    seed(42)
-        
+    # force the same sequence of random numbers
+    random.seed(42)
      
     # difficulty from 0 to 31 bits  
     for difficulty_bits in xrange(32):
         
         difficulty = 2 ** difficulty_bits
-        print "\nDifficulty: %ld (%d bits)" % (difficulty, difficulty_bits)
+        print "Difficulty: %ld (%d bits)" % (difficulty, difficulty_bits)
     
         print "Starting search..."
         
@@ -60,10 +65,7 @@ if __name__ == '__main__':
             # estimate the hashes per second
             hash_power = float(long(nonce)/elapsed_time)
             print "Hashing Power: %ld hashes per second" % hash_power
-
+    
         if not hash_result:
             print "Giving up."
             break
-    
-    
-    
